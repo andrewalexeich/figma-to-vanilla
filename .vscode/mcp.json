@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "figma-mcp-rust": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@alvinindra/figma-mcp-rust"
+      ]
+    }
+  }
+}
