@@ -47,6 +47,29 @@ Instead of relying on a single large prompt, the project uses a modular architec
   <p><strong>One design. One structured workflow. Clean, framework-free code.</strong></p>
 </blockquote>
 
+## What This PR Changes
+
+Scope: measured verification and animation craft, taken from field runs of this workflow — three single frames, one long Apple-scale page, and one scroll-driven storyboard. No existing rule is rewritten; every change is an added section.
+
+| File | Added | Why |
+| --- | --- | --- |
+| `references/verification.md` | `3. Measured Comparison (Pixel Diff)` | "Compared visually" was an assertion. Three metrics (ΔE>30, ΔE>100, RMSE), REST `scale=1` reference vs headless render at the same size, text masked for geometry, per-zone breakdown, numeric element boxes, a pass above the design width. Field calibration included. |
+| `references/css-conventions.md` | `AUTO Line Height and Nested Fills` | `line-height: normal` resolves to 1.25em in Chrome but ≈1.21em in Figma (Inter Tight): multiline blocks drifted 3–5 px and left a seam. AUTO must become an explicit integer `rem` step; fills must be read from the text node, not its section. |
+| `references/assets.md` | `4. Transformed Fills and Fill Mapping` | A node with `imageTransform` (`STRETCH`, `scaleY 0.74`) cannot use the raw `imageRef` — it arrives squashed. Export the rendered node at `scale=2`. Also: map the used refs explicitly (70 refs, 12 used) and confirm layer order by neighbouring exports. |
+| `references/figma-components.md` | `Interaction States From Variants` | Hover/pressed were missed twice on field runs because the page frame shows only `Default`. States must be read from their own variants and enumerated before CSS; a default-frame diff cannot reveal the gap. |
+| `references/mcp-rules.md` | `5. Role Split: REST for Reads, Bridge for Writes` | The desktop bridge drops mid-session. Splitting REST (reads) from the bridge (writes/screenshots) keeps work moving; also covers the cloud endpoint's `User-Agent`/`MCP-Protocol-Version` requirements and its different tool surface (105 vs 134). |
+| `references/animations.md` | `19`–`26` | Storyboard delta table, discrete slot model for lists, headless harness for sticky scenes, progress search instead of guessing, no dwell in carousels, real cubic-bézier set with the no-bounce rule, smoothness measured as a velocity profile, and Lenis integration without double smoothing. |
+| `references/production-git.md` | `7. Deploy Verification` | "rsync exited 0" is not a deployment: dry-run clean, hashes equal, live URL serving current assets. |
+| `SKILL.md` | `3. Measured Workflow` | The order of work, with an explicit rule that a stage without a measurement is not finished. |
+
+### Numbers from the runs
+
+| Case | Result |
+| --- | --- |
+| Main frame (1600×900) | ΔE>30 global 0.67% · geometry with text masked 0.0000% · element boxes exact |
+| Long page (1600×4547) | 1.13% global, hidden cliffs found per zone: header 2.95%, footer 3.30% · `line-height` fix took the page from 1.34% to 0.48% |
+| Scroll storyboard | keyframes 0.47 / 5.73 / 1.60 / 5.80 / 2.26 / 4.82% · smoothness peak 17.6% (continuous) vs 31% (stepped carousel, rejected) |
+
 ## Features
 
 <table border="1">

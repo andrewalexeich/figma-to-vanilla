@@ -275,3 +275,13 @@ The user connects the GitHub repository to Vercel independently.
 The AI must not assume that Vercel is already connected unless this has been explicitly requested and the corresponding access has been provided.
 
 After the GitHub repository is connected to Vercel, subsequent `git push` operations may trigger automatic deployment.
+
+## 8. Deploy Verification
+
+Uploading is not deploying. After the upload, confirm three things before reporting the task as deployed:
+
+1. `rsync --dry-run --itemize-changes` between the build output and the target returns nothing;
+2. `sha256sum` of the entry HTML and the minified CSS/JS match in the build and in the target;
+3. the live URL serves the current files — the HTML references the minified assets and each responds 200.
+
+`rsync exited 0` proves the copy ran, not that the target is current.

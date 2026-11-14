@@ -112,3 +112,9 @@ The component name in Figma does not have to match the CSS class name exactly.
 For example, a Figma component may be named `hero-btn`, while its semantic BEM class in HTML/CSS may be `.button`.
 
 When choosing a CSS class, follow the semantics and BEM structure of the implemented website rather than mechanically copying the names of Figma Layers, Components, or Variants.
+
+## Interaction States From Variants
+
+Read every state variant from its own node (`State=Hover`, `State=Pressed`, `State=Focus`) and transfer its values into the state rule. Do not approximate hover by darkening the default fill.
+
+A page frame normally shows only `Default` while the Component Set still carries the rest: omitting them reads as unfinished work, and no pixel diff of the default frame can reveal the gap. Enumerate the interactive elements of the page and the states each one has before writing CSS.

@@ -93,3 +93,21 @@ For tasks involving layout implementation and responsiveness, visual verificatio
 **The main completion criterion remains unchanged:**
 
 > The website must not merely work technically; it must match the provided Figma design as accurately as possible.
+
+## 3. Measured Comparison (Pixel Diff)
+
+"The result matches the design" is an assertion until it has a number. Measure every finished page and every animation checkpoint.
+
+**Reference and render must be 1:1.** Export the frame through the REST API at native scale — `GET https://api.figma.com/v1/images/{file-key}?ids={node-id}&format=png&scale=1` — and screenshot the page with headless Chromium at exactly the frame size (`--force-device-scale-factor=1 --hide-scrollbars --window-size=<W>,<H> --screenshot`). Never measure against a plugin or marketplace screenshot: it is resampled to the vision limit (≈0.98×), so it reports differences that do not exist and hides ones that do.
+
+**Report three figures, not one:** share of pixels with ΔE>30, share with ΔE>100, and RMSE. ΔE>30 alone is too forgiving for thin type.
+
+**Mask the text layer when checking geometry.** Anti-aliased glyphs produce non-zero ΔE on an otherwise exact layout; a geometry pass with text masked can read 0.0000% while the global figure sits near 0.7%.
+
+**Break the figures down by zone.** A comfortable global number hides cliffs: a page at 1.13% global contained a 3.3% footer and a 2.95% header, and only the per-section table pointed at them.
+
+**Pin element boxes.** Assert bounding boxes of fixed elements numerically (header buttons, nav items, footer bars). A 2 px shift survives the eye and fails the box.
+
+**Check above the design width too** (e.g. 2560×1200): the container must stay centred and fixed, without overflow.
+
+Calibration from field runs of this workflow: ΔE>30 of 0.5–1.2% is a good page result; a fix that matters moves the figure on the order of 1.34% → 0.48%.

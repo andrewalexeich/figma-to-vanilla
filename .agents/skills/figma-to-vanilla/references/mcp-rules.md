@@ -156,3 +156,16 @@ Context optimization must never compromise implementation accuracy.
 - Retrieve additional information whenever the available data is insufficient to make an accurate implementation decision.
 
 The primary objective is to minimize unnecessary context consumption while preserving the completeness and accuracy of Figma design analysis.
+
+## 5. Role Split: REST for Reads, Bridge for Writes
+
+Split responsibilities instead of depending on one channel:
+
+- **REST API** (`/v1/files/{key}/nodes`, `/v1/images`, `/v1/files/{key}/styles`) — structure, styles, assets, exports. This is the reliable read path and it keeps working when the desktop bridge drops.
+- **Desktop/cloud MCP bridge** — writes, plugin-side actions, runtime screenshots. It disconnects mid-session (pairing expires, the plugin reloads); a dropped bridge must not stop implementation.
+
+Do not block a task on the bridge when REST answers the same question.
+
+Keep the token in `.env` and reference it from the config as `${FIGMA_ACCESS_TOKEN}`; never inline the value.
+
+If a cloud endpoint of `figma-console-mcp` is used, it requires a plain `User-Agent` header (Cloudflare rejects `initialize` with 403 otherwise) and `MCP-Protocol-Version: 2025-03-26`. Its tool surface differs from the local server (105 vs 134 tools) — for example `figma_diagnose` instead of `figma_get_status`. Pairing codes are single-use and expire after 5 minutes.

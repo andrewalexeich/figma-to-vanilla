@@ -198,3 +198,9 @@ When transferring text from Figma, preserve:
 * `text-align`.
 
 Do not change these parameters solely for coding convenience.
+
+### AUTO Line Height and Nested Fills
+
+When Figma reports AUTO line height, never leave `line-height: normal`. Chrome resolves `normal` from font metrics (Inter Tight → 1.25em) while Figma computes ≈1.21em: multiline blocks drift 3–5 px and a seam appears where the block ends. Take an explicit value from the Figma render, and for AUTO round to an integer `rem` step — type set on a 26 px step is `2.6rem`, not `2.64rem`, because Figma rounds line boxes and the fraction accumulates down the block. For small type use ceil values (`8.5rem`/`6rem`/`3.3rem`/`2.3rem`) rather than the exact ratio.
+
+Read the property from the text node, not from its section: a child often overrides the inherited colour (`#000000` type inside a `#211E1E` block is normal).

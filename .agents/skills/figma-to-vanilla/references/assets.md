@@ -118,3 +118,9 @@ Use SVG in its original format.
 Do not convert SVG to WebP.
 
 If an SVG is an icon, logo, or another vector asset, use it as SVG.
+
+## 4. Transformed Fills and Fill Mapping
+
+If a node carries a non-identity `imageTransform` (`STRETCH` with `scaleY`/`scaleX` ≠ 1), do not use the raw `imageRef`: the stored bytes are pre-transform. Export the rendered node through the REST image API at `scale=2` and place that file — a raw ref arrives distorted (a card with `scaleY 0.74` came in squashed).
+
+Collect fill refs from the frame JSON and map them onto layers deliberately. Most files carry far more refs than the design uses (70 refs, 12 used); confirm layer order by comparing exported neighbouring nodes rather than by index or name.

@@ -117,3 +117,17 @@ If two project rules genuinely conflict with each other, do not choose an option
 If a required reference file has already been read during the current task and its rules have not changed, it does not need to be read again unless necessary.
 
 When moving on to a new task, determine the necessary reference files again based on the current context.
+
+# 3. Measured Workflow
+
+Every stage ends with a number, not with a statement that it is done:
+
+1. **Figma data** — structure, styles, assets, states (REST for reads).
+2. **Static layout** — implemented at the design width, explicit `line-height`, exact typography.
+3. **Pixel diff** — reference and render at 1:1, three metrics, per-zone breakdown, element boxes (`verification.md`).
+4. **Interaction** — component states read from variants, hover/focus implemented.
+5. **Animation** — built from the storyboard delta table, continuous mapping, real easing curves (`animations.md`).
+6. **Motion quality** — a series of frames read as a velocity profile, no spikes, no dwell plateaus.
+7. **Deploy** — dry-run clean, hashes equal, live URL current (`production-git.md`).
+
+If a stage has no measurement, it is not finished. Do not report a result as verified while the only evidence is that it renders.
