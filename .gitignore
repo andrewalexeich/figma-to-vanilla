@@ -17,3 +17,6 @@ node_modules/
 tmp/
 temp/
 *.tmp
+
+# Machine-specific preflight output
+config.env

@@ -41,6 +41,67 @@ Do not consider the task complete simply because the HTML technically works.
 
 The result must be visually compared with Figma.
 
+### Measurable Verification (pixel diff)
+
+"Compared visually" is an assertion, not a check. A layout is not done until it has a number:
+
+1. **Reference:** the frame exported at 1:1 — a file export at `scale=1`, not a screenshot. A screenshot that passes through a vision model is resampled (≈0.98×) and reports differences that do not exist.
+2. **Render:** headless Chromium at exactly the frame size — `--force-device-scale-factor=1 --hide-scrollbars --window-size=<W>,<H> --screenshot`. Same size in, same size out; any rescale invalidates the numbers.
+3. **Metrics — all three:** share of pixels with ΔE>30, share with ΔE>100, RMSE. ΔE>30 alone is too forgiving for thin type.
+4. **Mask text when checking geometry:** anti-aliasing on glyphs produces non-zero ΔE on an otherwise exact layout (a masked comparison can read 0.0000 % while the global figure is ~0.7 %).
+5. **Zones:** compute the same metrics per section. A comfortable global figure hides cliffs — a page at 1.1 % global contained a 3.3 % footer and a 2.95 % header, and only the per-zone table pointed at them.
+6. **Element assertions:** pin bounding boxes of fixed elements (button rows, nav, footer bars) and diff them numerically; a 2 px shift passes the eye and fails the box.
+7. **Repeat above the design width** (e.g. 2560×1200): the container must stay centred and fixed, with no overflow.
+
+Calibration for this project family: ΔE>30 of 0.5–1.2 % is a good page result; a fix that actually matters moves the figure on the order of 1.34 % → 0.48 %.
+
+### What the User Sees
+
+Measuring is half of the check. The other half is what arrives in the report: a number alone ("ΔE>30 is 0.44%") tells the user nothing, and "looks right" is not a criterion.
+
+Every verification ends with four artifacts, delivered together:
+
+1. **Both screenshots, labelled** — what each one is and at which scale:
+   - `Design — frame 313:33 exported at 1:1, 1600×900`
+   - `Layout — headless render, 1600×900, device-scale-factor=1`
+2. **An overlay map with a legend.** Design in the red channel, layout in the green channel: where they coincide the pixel is neutral, a shift reads as red or green fringing, and the colour tells **which way** it moved. A legend line is mandatory — an unexplained coloured image is not evidence.
+3. **An amplified diff (×5)** for thin type, where ΔE lives in the anti-aliasing and the overlay looks clean.
+4. **The findings**, as a list: each hotspot with its coordinates from the zone grid, the cause, and the fix — or an explicit "no discrepancy in this zone" verdict.
+
+### Reading the maps
+
+| What the map shows | Cause | Fix |
+| --- | --- | --- |
+| Vertical red or green fringe along text | shift on X: tracking, container width, `letter-spacing` in px instead of `em` | check the node's `letterSpacing`, convert % to `em`, re-measure |
+| Double contour at the bottom of a paragraph | `line-height: normal` against Figma AUTO (1.25em vs ≈1.21em) | explicit integer `rem` step, re-measure the line step |
+| A whole section offset by N px | section height or the seam between sections | compare `absoluteBoundingBox` of the sections, fix padding/min-height |
+| Rainbow fringe around an image | resampling: the comparison is not 1:1, or the asset was re-encoded | re-render at 1:1, place the exported file, not a resized copy |
+| Solid red patches where an icon sits | wrong icon, wrong size, or a reconstruction instead of the SVG from the file | take the SVG from the file at the node's size |
+| A missing soft shadow or gradient | the node's `effects` were not transferred | read `effects` from the node and reproduce them as-is |
+| Differences only in glyph anti-aliasing | sub-pixel rendering differs from Figma's renderer | mask the text and check geometry separately: if it reads 0.0000%, this is not a defect |
+
+### Rules
+
+- The verdict is written **per zone**, never from the global figure. A page at 1.1% global contained a 3.3% footer and a 2.95% header; only the per-zone table pointed at them.
+- A fix goes from the cause to the source value (the node's data → CSS), not "nudge until the map turns white".
+- After every fix, re-measure with the same grid and the same three metrics, so the change is visible as a number, not as an impression.
+- Keep the artifacts in the project, not in a temporary directory:
+
+```
+previews/
+  design-<node>.png      # design, 1:1
+  layout-<page>.png      # implementation, 1:1
+  overlay-<page>.png     # coincidence map
+  diff-<page>.png        # amplified diff
+  report-<page>.png      # both panels + both maps + metrics and zones
+```
+
+The composite is what the user receives: four labelled panels and a metrics line under them. The separate files stay for history and for the next measurement.
+
+### Reference run
+
+Frame `313:33`, 1600×900: ΔE>30 **0.44%**, ΔE>100 0.19%, RMSE 8.01. Hotspots — `(600,360)–(800,540)` 3.74% and `(800,360)–(1000,540)` 3.68% (the headline in the centre) and `(600,0)–(800,180)` 2.43% (the header navigation). The overlay map shows no large coloured areas: the differences are local and live in glyph anti-aliasing; with the text masked, the geometry matches. The verdict is therefore "no layout defect, the difference is the font renderer" — a conclusion the metrics alone could not justify.
+
 ### Final Verification
 
 Before completing the task, make sure that:

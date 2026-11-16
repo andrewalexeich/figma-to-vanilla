@@ -212,6 +212,10 @@ line-height: 120%;
 
 Do not convert percentage-based `line-height` to px without necessity.
 
+When Figma shows AUTO line height, never leave `line-height: normal`. Chrome resolves `normal` from font metrics (Inter Tight → 1.25em) while Figma computes ≈1.21em, so multiline blocks drift 3–5 px and a section seam appears where the block ends. Set an explicit value taken from the Figma render, and for AUTO round to an integer step in `rem` — a 24 px type rendered on a 26 px step is `2.6rem`, not `2.64rem`: Figma rounds line boxes, and the fractional value accumulates over the block. For small type (`8–9 px`) use the ceil value (`8.5rem`/`6rem`/`3.3rem`/`2.3rem`) rather than the exact ratio.
+
+Check the same property on the text node, not on its section: a child frequently overrides the inherited colour (`#000000` type inside a `#211E1E` block is normal). Read `fills`/`style` of the node that holds the characters.
+
 ### Full Typography Correspondence
 
 When transferring text from Figma, preserve:

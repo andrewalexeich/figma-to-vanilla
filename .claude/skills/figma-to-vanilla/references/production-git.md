@@ -353,3 +353,13 @@ If authentication or access is unavailable, inform the user.
 Do not claim that a repository has been created or a push has been completed unless the corresponding operation has actually completed successfully.
 
 The `.agents/` or `.claude/` directory must not be used as a location for the website's HTML/CSS/JS files.
+
+## 7. Deploy Verification
+
+Uploading is not deploying. After the files are uploaded — by whatever means the project uses (`rsync`, `scp`, a CI step) — confirm three things before reporting the task as deployed:
+
+1. a dry run of the upload (`rsync --dry-run --itemize-changes` when rsync is used) between the build output and the target returns nothing;
+2. `sha256sum` of the entry HTML and of the minified CSS/JS match in the build and on the target;
+3. the live URL serves the current files — the HTML references the minified assets and each of them responds 200.
+
+An exit code of 0 proves the copy ran, not that the target is current.

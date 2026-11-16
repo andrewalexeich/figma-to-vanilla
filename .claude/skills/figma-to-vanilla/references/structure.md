@@ -44,6 +44,20 @@ Do not introduce unnecessary directories, files, components, partials, or templa
 - Reuse existing files and directories whenever appropriate.
 - Keep the source files and production files separate when production preparation is required, following `production-git.md`.
 
+#### CSS File Split
+
+The hybrid approach is expressed in the project files, not only in the naming discipline:
+
+- `src/styles/global.css` — reset, custom properties, base typography, shared containers, and genuinely global rules;
+- `src/styles/components.css` — styles of reusable components;
+- `src/styles/page-<name>.css` — styles of one page or section.
+
+Connect them in `<head>` in this order, and only as far as the current page needs them: `global.css` on every page, `components.css` only on pages where those components are used, `page-<name>.css` only on its own page. In a Single-page project the same split applies, with section styles in place of page styles; a separate file for every section is still unnecessary unless the project structure justifies it.
+
+A single shared stylesheet is one valid project structure: an existing project may keep it and must not be restructured without a reason. A new project should not be reduced to it — one file cannot express "load component CSS only where the components are used".
+
+Directory trees in documentation are illustrative. The split described here defines the structure, not any particular example.
+
 ### Assets
 
 - Store local font files in `.woff2` format in `src/fonts/` when local fonts are required.
