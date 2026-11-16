@@ -131,10 +131,10 @@ At viewport widths greater than 1920px, the layout must be fixed relative to its
 
 If the main container in Figma uses Auto Layout and has a limited width, you must:
 
-* determine its `max-width` from Figma;
-* set `max-width` in **px**;
-* use `margin: 0 auto` for horizontal centering;
-* do not stretch the container beyond its width in Figma.
+- determine its `max-width` from Figma;
+- set `max-width` in **px**;
+- use `margin: 0 auto` for horizontal centering;
+- do not stretch the container beyond its width in Figma.
 
 For example, if the main container width in Figma is 1600px:
 
@@ -150,9 +150,9 @@ For dimensions that must remain fixed at resolutions **above 1920px**, use `px`,
 
 Thus:
 
-* **up to 1920px** — Fluid Responsive;
-* **above 1920px** — a fixed layout based on Figma dimensions, with `max-width` and centering;
-* the main container must not continue growing along with the viewport.
+- **up to 1920px** — Fluid Responsive;
+- **above 1920px** — a fixed layout based on Figma dimensions, with `max-width` and centering;
+- the main container must not continue growing along with the viewport.
 
 ### Important Rule
 
@@ -172,18 +172,18 @@ Use the provided responsive designs as the **only source of truth** for responsi
 
 Process each provided responsive design using the same Fluid Responsive system:
 
-* determine the width of the Figma design;
-* determine the corresponding breakpoint;
-* convert element dimensions from Figma px to `rem` by dividing by 10.
+- determine the width of the Figma design;
+- determine the corresponding breakpoint;
+- convert element dimensions from Figma px to `rem` by dividing by 10.
 
 Do not independently invent:
 
-* additional breakpoints;
-* dimensions;
-* element rearrangements;
-* hiding elements;
-* mobile navigation;
-* layout changes,
+- additional breakpoints;
+- dimensions;
+- element rearrangements;
+- hiding elements;
+- mobile navigation;
+- layout changes,
 
 if these are not present in the provided design or explicitly specified by the user.
 
@@ -219,6 +219,10 @@ Implement only the provided desktop design.
 
 Do not invent a mobile version independently.
 
+The established Fluid Responsive system described in Section 1 must still be applied. It controls proportional scaling but does not authorize inventing responsive layout changes.
+
+Do not create additional breakpoints or responsive layout variations that are not supported by the provided Figma designs.
+
 ## 3. Containers
 
 Do not automatically treat the desktop Frame width as the maximum width of the inner container.
@@ -227,33 +231,19 @@ The actual `max-width` must be determined based on Figma Auto Layout and structu
 
 Do not invent `max-width` independently.
 
-At resolutions above 1920px, use the following structure:
-
-```css
-.block__container {
-    width: 100%;
-    max-width: 1920px;
-    margin: 0 auto;
-}
-```
-
-Apply `max-width: 1920px` if it corresponds to the project structure and Fluid Responsive rules.
-
-If Figma specifies a different maximum width for a particular inner container, use the value confirmed by the design.
+At resolutions above 1920px, set the container's `max-width` according to its actual dimensions and constraints in Figma.
 
 For example:
 
-```css
-max-width: 1600px;
-```
+- `max-width: 1920px`;
+- `max-width: 1600px`;
+- `max-width: 1440px`.
 
-or:
+Do not use `max-width: 1920px` as a universal value for all containers.
 
-```css
-max-width: 1440px;
-```
+The outer layout and each inner container may have different maximum widths. Determine them separately from the Figma structure.
 
-Do not automatically set `max-width: 1920px` for an inner container solely because this is the maximum width of the viewport or outer Frame.
+If Figma specifies a different maximum width for a particular inner container, use the value confirmed by the design.
 
 At resolutions up to 1920px, preserve the existing Fluid Responsive system and correct container behavior within the parent block.
 

@@ -6,15 +6,39 @@ The main task is to accurately implement dimensions and layout using CSS, move r
 
 ## 1. CSS
 
-All CSS must be located only in:
+Organize CSS according to the established project architecture and the hybrid CSS organization approach.
 
-```text
-styles/styles.css
-```
+Use shared CSS files for global styles and separate files for components or pages when justified by the project structure.
 
 Do not create a separate file for CSS boilerplate.
 
-Do not create additional CSS files without the user's explicit instruction.
+Do not create unnecessary CSS files or split styles into separate files without a practical reason.
+
+Reuse existing CSS files whenever appropriate.
+
+### Native CSS Nesting
+
+Use native CSS Nesting when nested selectors improve readability and organization.
+
+Example:
+
+```css
+.button {
+    background-color: black;
+
+    &:hover {
+        background-color: gray;
+    }
+}
+
+.button__icon {
+    width: 2rem;
+}
+```
+
+Do not require SCSS or Sass for CSS nesting. Native CSS Nesting is sufficient for projects using standard CSS.
+
+If an existing project already uses SCSS or Sass, preserve its established approach.
 
 ### Dimensions and Centering
 
@@ -134,25 +158,29 @@ Class names must describe the purpose of the element.
 
 Avoid excessive selector nesting.
 
+Use consistent CSS naming conventions throughout the project.
+
+Do not introduce alternative naming conventions or arbitrary class naming patterns without a practical reason.
+
+For existing projects, preserve the established CSS naming conventions rather than introducing a different approach.
+
 ## 4. Containers
 
-Use a consistent BEM pattern for the main block container:
-
-`block__container`
+When a block has its own main container, use the `block__container` naming pattern.
 
 For example:
 
-```html
 <div class="hero__container">
     ...
 </div>
-```
 
-The `__container` name is mandatory for the main container of the corresponding block.
+Use the `__container` suffix consistently for the main container of a corresponding block.
 
-Do not use `block__inner`, `block__wrapper`, `block__content`, or other alternative names for the main container if this element is specifically the block's container.
+Do not use `block__inner`, `block__wrapper`, `block__content`, or other alternative names for the main container when the element serves specifically as the block's container.
 
-Do not create a separate `__inner` solely to designate the main container.
+Do not create an additional `__inner` element solely to designate the main container.
+
+Do not create unnecessary containers when they are not required by the design or HTML structure.
 
 ## 5. Typography
 
@@ -188,13 +216,81 @@ Do not convert percentage-based `line-height` to px without necessity.
 
 When transferring text from Figma, preserve:
 
-* `font-family`;
-* `font-weight`;
-* `font-size`;
-* `line-height`;
-* `letter-spacing`;
-* `text-transform`;
-* `color`;
-* `text-align`.
+- `font-family`;
+- `font-weight`;
+- `font-size`;
+- `line-height`;
+- `letter-spacing`;
+- `text-transform`;
+- `color`;
+- `text-align`.
 
 Do not change these parameters solely for coding convenience.
+
+### Figma Text Styles and CSS Classes
+
+Treat Figma Text Styles as predefined combinations of typography properties, not as individual CSS variables.
+
+Create reusable CSS classes for Figma Text Styles used in the implementation, preserving the meaning of their names and all defined typography properties.
+
+Name typography classes according to the purpose of the text style, not the device or viewport.
+
+For example, if Figma contains the following Text Styles:
+
+- Desktop/H1
+- Tablet/H1
+- Mobile/H1
+- Desktop/Link
+- Tablet/Link
+- Mobile/Link
+
+Create the corresponding CSS classes:
+
+```css
+.text-h1 {}
+.text-link {}
+```
+
+Do not include device names such as Desktop, Tablet, or Mobile in CSS class names when these styles represent responsive variants of the same text style.
+
+Define the base typography properties in the corresponding CSS class and override responsive values using media queries.
+
+Apply typography classes to HTML elements when their text corresponds to a Figma Text Style, regardless of the HTML tag or component role.
+
+Typography classes are responsible only for text appearance. They must not control component layout, positioning, spacing, or behavior.
+
+For example:
+
+```html
+<h1 class="main__title text-h1">Main page</h1>
+
+<a class="nav__link text-link" href="#">About</a>
+
+<button class="button text-button" type="button">Call me back</button>
+```
+
+Keep typography classes separate from BEM component and layout classes.
+
+Do not combine distinct Figma Text Styles into a single CSS class merely because some of their properties are identical.
+
+If Figma provides multiple distinct text styles with the same general purpose, preserve their differences using appropriate separate CSS classes.
+
+Each typography class must preserve the complete set of properties defined by its corresponding Figma Text Style:
+
+- `font-family`;
+- `font-weight`;
+- `font-size`;
+- `line-height`;
+- `letter-spacing`;
+- `text-transform`;
+- `color`;
+- `text-align`.
+
+Do not invent missing typography values or derive them from other Text Styles.
+
+CSS variables and typography classes serve different purposes:
+
+- CSS variables store individual reusable values, such as colors, font families, and other shared design properties.
+- Typography classes define complete combinations of properties corresponding to Figma Text Styles.
+
+Use both mechanisms together where appropriate.

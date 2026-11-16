@@ -56,7 +56,7 @@ Preserve the existing correct implementation and change only what is necessary f
 
 ### Context Minimization and Avoiding Repeated Analysis
 
-Detailed project rules are located in `/references/` inside the `.agents/skills/figma-to-web/` skill directory. Do not require the user to repeat or duplicate these rules in every request.
+Detailed project rules are located in `/references/` inside the `.agents/skills/figma-to-vanilla/` skill directory. Do not require the user to repeat or duplicate these rules in every request.
 
 When performing a task, use the existing project rules as the primary source of requirements and do not request them again unless necessary.
 
@@ -102,14 +102,15 @@ Perform a full project re-analysis only when the current task genuinely affects 
 
 ## 4. Mandatory Skill
 
-For tasks involving the development, implementation, adaptation, or verification of websites based on Figma designs, use the `figma-to-web` skill.
+For any tasks involving the development, implementation, adaptation, or verification of websites based on Figma designs, you must use the `figma-to-vanilla` skill.
 
-Before starting such a task, read its `SKILL.md` in full and follow the instructions contained in it.
+Before starting such tasks, read the entire `SKILL.md` file and follow its instructions.
 
 The skill is located at:
 
-`.agents/skills/figma-to-web/SKILL.md` (OpenCode, Codex) and `.claude/skills/figma-to-web/SKILL.md` (Claude Code, Cline).
+- `.agents/skills/figma-to-vanilla/SKILL.md` — for OpenCode, Codex, Cline, and other compatible AI agents.
+- `.claude/skills/figma-to-vanilla/SKILL.md` — for Claude Code.
 
-Detailed project technical rules are located in the `references/` directory inside the `.agents/skills/figma-to-web/` skill directory (OpenCode, Codex) and inside the `.claude/skills/figma-to-web/references/` directory (Claude Code, Cline).
+Detailed technical guidelines are provided in the `references/` directory within the corresponding skill directory.
 
-Do not load all reference files automatically. Select the necessary files according to the skill instructions.
+Do not load all reference files automatically. Select only the files relevant to the current task, following the instructions in `SKILL.md`.

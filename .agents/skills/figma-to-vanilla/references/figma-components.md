@@ -6,7 +6,11 @@ The main task is to identify Components, Component Sets, Variants, Component Pro
 
 ---
 
-Convert Figma Components into reusable BEM blocks within `index.html`.
+Convert Figma Components into reusable BEM blocks within the HTML structure of the project.
+
+For Single-page projects, implement components within the corresponding HTML document.
+
+For Multi-page projects, implement components within the HTML documents of the pages where they are used, following the project's established architecture and component reuse rules.
 
 Before creating a new component, check whether a suitable component already exists.
 
@@ -14,15 +18,21 @@ Do not create duplicates of the same component.
 
 ## Analysis of Components, Component Sets, and Variants
 
-When analyzing a Figma file, always check the sections/pages containing Components.
+When a UI Kit or component library is available, review its Components, Component Sets, Variants, and Component Properties during the initial design system analysis, following `design-system.md`.
+
+When analyzing individual page designs, identify the Components and Instances used on the provided page and compare them with the components already reviewed and recorded.
+
+If no UI Kit or component library is available, identify reusable components progressively as page designs are analyzed.
+
+Do not inspect all website pages in advance solely to search for reusable components. Identify opportunities for reuse as new pages are provided.
 
 It is necessary to identify:
 
-* Figma Components;
-* Component Sets;
-* Variants within Component Sets;
-* Component Properties;
-* Instances of these components used in the layout.
+- Figma Components;
+- Component Sets;
+- Variants within Component Sets;
+- Component Properties;
+- Instances of these components used in the layout.
 
 If a Component Set with multiple Variants exists in Figma, treat it as a single reusable component.
 
@@ -40,11 +50,11 @@ Create a single BEM block `.button` in HTML.
 
 Implement Variant states using the corresponding HTML/CSS/JS behavior:
 
-* Hover → `:hover`;
-* Focus → `:focus` / `:focus-visible`;
-* Active → `:active`;
-* Disabled → the corresponding element state;
-* other states → only if their behavior is confirmed by the design or requirements.
+- Hover → `:hover`;
+- Focus → `:focus` / `:focus-visible`;
+- Active → `:active`;
+- Disabled → the corresponding element state;
+- other states → only if their behavior is confirmed by the design or requirements.
 
 Do not create separate HTML blocks for each Variant.
 
@@ -52,21 +62,21 @@ If a Component is used in multiple places in the layout, use the same component 
 
 When analyzing a component, consider not only its appearance, but also:
 
-* component name;
-* Component Set;
-* Variant properties;
-* Variant property values;
-* dimensions;
-* Auto Layout;
-* internal spacing;
-* typography;
-* colors;
-* borders;
-* radii;
-* shadows;
-* states;
-* nested components;
-* used Assets.
+- component name;
+- Component Set;
+- Variant properties;
+- Variant property values;
+- dimensions;
+- Auto Layout;
+- internal spacing;
+- typography;
+- colors;
+- borders;
+- radii;
+- shadows;
+- states;
+- nested components;
+- used Assets.
 
 ## Figma Variants
 

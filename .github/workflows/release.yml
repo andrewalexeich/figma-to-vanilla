@@ -1,4 +1,3 @@
-
 name: Release
 
 on:
@@ -15,9 +14,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Get Commit Message
+        run: git log -1 --format=%B "$GITHUB_SHA" > release-notes.md
+
+      - name: Add Full Changelog
+        run: |
+          CURRENT_TAG="$GITHUB_REF_NAME"
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -Fvx "$CURRENT_TAG" | head -n 1 || true)
+
+          echo "" >> release-notes.md
+
+          if [ -n "$PREVIOUS_TAG" ]; then
+            echo "Full Changelog: https://github.com/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}" >> release-notes.md
+          else
+            echo "Full Changelog: https://github.com/${GITHUB_REPOSITORY}/commits/${CURRENT_TAG}" >> release-notes.md
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          generate_release_notes: true
+          body_path: release-notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
