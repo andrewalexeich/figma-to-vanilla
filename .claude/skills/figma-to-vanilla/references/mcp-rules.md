@@ -6,15 +6,15 @@ The main task is to retrieve and analyze data from Figma as the source of truth 
 
 ## 1. Working with Figma MCP
 
-Use the `figma-mcp-rust` MCP server for all Figma-related operations.
+Use the `figma-desktop-bridge` MCP server for all Figma-related operations.
 
-If multiple Figma MCP implementations are available simultaneously, give preference to `figma-mcp-rust`.
+If multiple Figma MCP implementations are available simultaneously, give preference to `figma-desktop-bridge`.
 
-Do not use other Figma MCP implementations to perform the same operations if `figma-mcp-rust` is available and provides the necessary tools.
+Do not use other Figma MCP implementations to perform the same operations if `figma-desktop-bridge` is available and provides the necessary tools.
 
-If `figma-mcp-rust` is unavailable or does not provide the required tool, inform the user. Do not automatically switch to another MCP implementation unless necessary.
+If `figma-desktop-bridge` is unavailable or does not provide the required tool, inform the user. Do not automatically switch to another MCP implementation unless necessary.
 
-When `figma-mcp-rust` is connected, use it as the source of Figma design data.
+When `figma-desktop-bridge` is connected, use it as the source of Figma design data.
 
 Before starting implementation, retrieve and analyze data from Figma through MCP if the task involves a specific Figma design.
 
@@ -22,27 +22,27 @@ Do not start implementation based solely on assumptions about the design structu
 
 Use Figma data to determine:
 
-* structure;
-* Auto Layout;
-* Layout Grid;
-* dimensions;
-* spacing;
-* alignment;
-* components;
-* Component Sets;
-* Variants;
-* Component Properties;
-* Instances;
-* typography;
-* colors;
-* borders;
-* radii;
-* shadows;
-* images;
-* SVG;
-* responsive layouts;
-* container widths;
-* element behavior.
+- structure;
+- Auto Layout;
+- Layout Grid;
+- dimensions;
+- spacing;
+- alignment;
+- components;
+- Component Sets;
+- Variants;
+- Component Properties;
+- Instances;
+- typography;
+- colors;
+- borders;
+- radii;
+- shadows;
+- images;
+- SVG;
+- responsive layouts;
+- container widths;
+- element behavior.
 
 ### Working with MCP and Project Files
 
@@ -68,17 +68,17 @@ After implementation, reuse the available Figma data to verify how closely the i
 
 Check correspondence with:
 
-* structure;
-* dimensions;
-* spacing;
-* typography;
-* Auto Layout;
-* components;
-* Variants;
-* images;
-* containers;
-* responsive layouts;
-* behavior above 1920px.
+- structure;
+- dimensions;
+- spacing;
+- typography;
+- Auto Layout;
+- components;
+- Variants;
+- images;
+- containers;
+- responsive layouts;
+- behavior above 1920px.
 
 If the Figma data is insufficient to verify a specific element, do not invent missing values.
 
@@ -97,7 +97,7 @@ Retrieve only the Figma data required for the current task.
 - Avoid requesting unrelated components, assets, styles, or page information.
 - Expand the retrieval scope only when additional information is required to understand the design structure or its dependencies.
 
-### 4.2. Appropriate Tool Selection
+### Appropriate Tool Selection
 
 Choose the MCP tool that provides the required information with the least unnecessary data.
 

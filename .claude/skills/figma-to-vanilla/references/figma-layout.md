@@ -8,20 +8,24 @@ The main task is to accurately determine the relationships between elements, Aut
 
 Before implementation, carefully analyze:
 
-* Auto Layout;
-* Layout Grid;
-* element arrangement direction;
-* element dimensions;
-* repeated dimensions;
-* spacing consistency;
-* alignment;
-* distances between elements;
-* parent-child relationships;
-* repeated components;
-* visual groups;
-* changes between responsive designs;
-* maximum container widths;
-* Auto Layout behavior at resolutions above 1920px.
+- Auto Layout;
+- Layout Grid;
+- element arrangement direction;
+- element dimensions;
+- repeated dimensions;
+- spacing consistency;
+- alignment;
+- distances between elements;
+- parent-child relationships;
+- repeated components;
+- visual groups;
+- changes between responsive designs;
+- maximum container widths;
+- shared container widths and maximum widths;
+- horizontal container padding;
+- recurring section spacing;
+- layout parameters defined through Figma Variables or other shared design system materials.
+- Auto Layout behavior at resolutions above 1920px.
 
 ## 2. Transferring Spacing from Figma Auto Layout
 
@@ -41,12 +45,12 @@ When transferring a layout from Figma, distinguish between the outer Frame/Secti
 
 If the HTML contains an outer section and an inner Container, determine from the Figma structure which level each geometric property belongs to:
 
-* `height` / `min-height`;
-* `100vh` / `100svh` / `100dvh`;
-* outer `padding`;
-* `max-width`;
-* inner `padding`;
-* alignment and layout of child elements.
+- `height` / `min-height`;
+- `100vh` / `100svh` / `100dvh`;
+- outer `padding`;
+- `max-width`;
+- inner `padding`;
+- alignment and layout of child elements.
 
 Do not automatically transfer properties of the outer Figma Frame/Section to the inner Container just because the Container is its first child element.
 
@@ -82,7 +86,7 @@ Do not transfer `x/y` coordinates from Figma directly into `position: absolute`.
 
 Use `position: absolute` only when an element actually needs to:
 
-* overlap another element;
-* have independent positioning;
-* be a decorative element;
-* be placed on top of another element.
+- overlap another element;
+- have independent positioning;
+- be a decorative element;
+- be placed on top of another element.

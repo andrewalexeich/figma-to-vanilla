@@ -8,7 +8,7 @@ The main task is to accurately identify the fonts and graphic assets used in Fig
 
 Before implementation, identify the exact font used in Figma.
 
-If the exact font is available in Google Fonts, load it from Google Fonts in `index.html`.
+If the exact font is available in Google Fonts, load it in the HTML documents of the pages that use the font. If font loading is managed through a shared mechanism within the project architecture, use the existing mechanism.
 
 For example:
 
@@ -18,19 +18,11 @@ For example:
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 ```
 
-If the exact font is not available in Google Fonts, use the `.woff2` file provided by the user in:
-
-```text
-fonts/
-```
+If the exact font is not available in Google Fonts, use the `.woff2` file provided by the user in `src/fonts/`
 
 ### Local `.woff2` Fonts
 
-The `.woff2` files provided by the user are the project's original font files and must be stored in the directory:
-
-```text
-fonts/
-```
+The `.woff2` files provided by the user are the project's original font files and must be stored in `src/fonts/`
 
 Do not move them to `images/`, `styles/`, or other directories.
 
@@ -48,8 +40,8 @@ Use `@font-face` to load local `.woff2` files:
 
 If the user provides multiple `.woff2` files for the same font with different typefaces or weights, load each file with the corresponding:
 
-* `font-weight`;
-* `font-style`.
+- `font-weight`;
+- `font-style`.
 
 Do not combine different typefaces into a single `@font-face`.
 
@@ -69,47 +61,43 @@ Do not present a random font as an exact match for Figma.
 
 Use actual images and graphic assets from Figma/the project.
 
-Store all regular images in:
-
-```text
-images/
-```
+Store all regular images in `src/images/`.
 
 Do not use:
 
-* random images from the internet;
-* placeholders instead of provided images;
-* invented URLs;
-* non-existent files.
+- random images from the internet;
+- placeholders instead of provided images;
+- invented URLs;
+- non-existent files.
 
 If a required asset is missing, inform the user.
 
 ### PNG/JPG → WebP
 
-All PNG/JPG images obtained from Figma and used as regular website images must be converted to WebP.
+Convert PNG/JPG/JPEG images used as regular website images to WebP during production preparation or when explicitly requested by the user.
 
-Use the installed Node.js and a suitable Node.js package/tool for image processing.
+Preserve the original image files in the source project. Never modify, overwrite, or delete them during conversion.
 
-Do not write your own image conversion algorithm.
+During production preparation, convert copies of the original images inside the `build/` directory, not the source files.
 
 After successful conversion:
 
-1. Verify that the WebP file was created correctly.
-2. Replace references to the original PNG/JPG in HTML/CSS with `.webp`.
-3. Make sure the project uses WebP.
-4. **Delete the original PNG/JPG from the project.**
+1. Verify that every WebP file was created correctly.
+2. Check image quality and transparency.
+3. Preserve the original directory structure and filenames when creating WebP versions.
+4. Update references in production HTML and CSS files to use the corresponding WebP files.
+5. Verify that all updated references point to existing WebP files.
+6. Remove the corresponding original PNG/JPG/JPEG files from `build/` only after successful conversion and verification.
 
-As a result, only the WebP version of a regular image should remain in the project.
+If conversion fails or a WebP file cannot be verified, keep the corresponding original image in `build/` and preserve its existing references.
+
+Do not convert SVG files, favicons, or font files.
 
 ### Important Exceptions
 
-* Do **not convert** SVG to WebP.
-* Do **not convert** Favicon to WebP.
-* Do **not delete** Favicon files.
-* If a PNG/JPG contains transparency, preserve transparency during conversion.
-* Do not delete the original PNG/JPG before successfully creating and verifying the WebP file.
-* If conversion fails, keep the original file and inform the user about the problem.
-* Do not create a fake `.webp` file if conversion has not taken place.
+- Do not delete or modify original favicon files.
+- Preserve image transparency during conversion.
+- Do not convert font files.
 
 ## 3. SVG
 
@@ -118,3 +106,24 @@ Use SVG in its original format.
 Do not convert SVG to WebP.
 
 If an SVG is an icon, logo, or another vector asset, use it as SVG.
+
+### External SVG
+
+Use external SVG files through `<img>` or CSS backgrounds when their internal elements do not need to be accessed or controlled individually.
+
+Preserve the original SVG file and its structure.
+
+### Inline SVG
+
+Use inline SVG when individual internal SVG elements need to be styled, animated, or controlled through CSS or JavaScript.
+
+Inline SVG provides direct access to its internal elements, including `<path>`, `<circle>`, `<rect>`, and other SVG elements.
+
+For example, use inline SVG when:
+- individual SVG elements need different colors or styles;
+- internal elements need to change their appearance in interactive states;
+- SVG elements require CSS animations or JavaScript control.
+
+Do not use external SVG files through `<img>` or CSS backgrounds when direct access to their internal elements is required.
+
+Preserve the original SVG appearance and structure unless modifications are necessary for the implementation.

@@ -6,7 +6,11 @@ The main task is to verify visual consistency with the design, responsive behavi
 
 ## 1. Visual Consistency Verification
 
-After implementation, compare the website with Figma.
+Verify the implementation progressively during development, comparing each implemented section or page with the corresponding Figma design.
+
+After completing a page, perform a final visual verification of the entire page against its main Figma Frame.
+
+For Multi-page projects, perform this verification separately for each implemented page.
 
 Check:
 
@@ -41,11 +45,13 @@ The result must be visually compared with Figma.
 
 Before completing the task, make sure that:
 
-- all HTML is contained only in `index.html`;
-- there are no extra HTML files;
-- there are no `components/`, `partials/`, `templates/`, or similar HTML directories;
-- CSS is located only in `styles/styles.css`;
-- JavaScript is located only in `scripts/scripts.js`;
+- the HTML structure follows the established project architecture:
+  - for Single-page projects, the website is implemented within a single HTML document;
+  - for Multi-page projects, each implemented page has its own HTML document;
+- no unnecessary HTML files, directories, components, partials, or templates have been created;
+- CSS files are organized according to the established project architecture and CSS organization rules;
+- JavaScript files are organized according to the established project architecture;
+- CSS is connected only where it is needed, following the established global, component, and page-level styles;
 - BEM classes are used;
 - there are no meaningless class names;
 - CSS variables are used;
@@ -69,27 +75,37 @@ Before completing the task, make sure that:
 - there is no unnecessary JavaScript;
 - there are no duplicate components;
 - responsive behavior is implemented only based on the provided design;
-- if minification is requested by the user or the project is being prepared for publication, production `index.html` loads `styles/styles.min.css` and `scripts/scripts.min.js`;
-- if minification is requested by the user or the project is being prepared for publication, the minified CSS/JS files are up to date relative to the source files.
+- if minification is requested by the user or the project is being prepared for publication, the HTML documents of the implemented pages load the corresponding minified CSS and JavaScript files;
+- if minification is requested by the user or the project is being prepared for publication, the minified CSS/JS files are up to date relative to their source files.
 
 ## 2. Live Server
 
-For tasks involving HTML/CSS/JS, responsiveness, or visual results, run the project through Live Server to visually inspect and verify the result in the browser.
+For tasks involving HTML/CSS/JS, responsiveness, or visual results, launch the project using the Live Server extension in VS Code.
 
-Do not ask the user to open `index.html` directly in the browser if the project can be opened through Live Server.
+Open the main HTML file in VS Code and use `Open with Live Server` from the editor context menu or the `Go Live` button in the VS Code status bar.
 
-After the first Live Server launch, do not stop it independently after completing an individual task.
+Do not substitute direct browser access through the `file://` protocol or another local server when the Live Server extension is available.
 
-Keep Live Server running for further work on the project.
+When the development environment supports launching Live Server, start it and keep it running so the user can open the project in their browser and verify the result.
+
+Do not ask the user to open `index.html` or other `.html` files directly in the browser when the project can be accessed through Live Server.
+
+If browser access is available, independently inspect the implementation through the browser and compare it with Figma.
+
+For Single-page projects, verify the implemented page.
+
+For Multi-page projects, make all implemented pages accessible through Live Server using their corresponding HTML documents.
+
+When implementing a page section by section, verify individual sections during implementation and perform a final visual verification of the entire page after all its sections have been implemented.
+
+After making changes to HTML/CSS/JS, refresh the page through the existing Live Server instance and verify the updated result.
+
+Do not restart an already running Live Server unless necessary.
 
 Do not terminate the Live Server process until the user has finished working on the project or explicitly asks to stop it.
 
-After making changes to HTML/CSS/JS, do not restart an already running Live Server unless necessary. Refresh the page through it and verify the result.
+If the environment does not support launching Live Server, explain this limitation to the user.
 
-If Live Server is not running yet, start it before visual verification.
-
-For tasks involving layout implementation and responsiveness, visual verification through Live Server is mandatory.
-
-**The main completion criterion remains unchanged:**
+The main completion criterion remains unchanged:
 
 > The website must not merely work technically; it must match the provided Figma design as accurately as possible.
