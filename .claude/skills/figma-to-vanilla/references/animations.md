@@ -346,3 +346,64 @@ Do not change existing values, layout, components, or responsive rules without n
 Do not rewrite an already working animation implementation without a reason.
 
 The main principle: first understand the visual sequence and the states of elements in Figma, then choose the minimum suitable CSS/JS mechanism and implement the animation on top of the existing correct project structure.
+
+## 19. Storyboard Delta Table Before Coding
+
+Turn the frames into a table before writing code: for each step, only the properties that change, in absolute values converted to `rem`, plus the elements that appear, disappear, and stay still. Animating from a table makes the timeline explicit; animating from screenshots makes it guesswork. Record the scroll progress of every keyframe — it is the contract for verification later.
+
+## 20. Discrete Slots for Lists
+
+When a storyboard shows a list or carousel where items change emphasis, model it as slots rather than as per-element motion: the active item at 100%, its neighbours at a reduced state (25%), the rest hidden. Move the list as one strip and cross-fade each item between slot states by blending the phase between integer positions — `lerp(state(i), state(i + 1), phase)` — instead of interpolating text properties per pixel.
+
+Unfold and fold the deck with `transform` and `z-index` only: layout properties mid-animation force reflow and produce visible steps.
+
+## 21. Verifying Scroll Animation in Headless Chromium
+
+Native scrolling does not move a sticky scene in headless mode — `window.scrollTo` leaves the screenshot empty (`non-bg pixels: 0`). Drive the scene directly:
+
+```js
+window.matchMedia = () => ({ matches: true, addEventListener() {}, removeEventListener() {} });
+Object.defineProperty(section, 'offsetHeight', { get: () => innerHeight + TRAVEL });
+section.getBoundingClientRect = () => ({ top: -TRAVEL * progress, height: innerHeight, /* … */ });
+window.dispatchEvent(new Event('scroll'));
+```
+
+With `prefers-reduced-motion` forced true the render applies instantly, so each screenshot is a true checkpoint rather than a frame caught mid-lerp.
+
+## 22. Search the Progress Point, Do Not Guess It
+
+Static keyframes sit at exact progress values (0, 0.2, 0.42, end). Transitional frames do not: scan a window of progress values, render each, and keep the minimum ΔE. Any change of easing or phase length moves these points — re-run the search after every timing change, otherwise stale expectations read as regressions.
+
+## 23. Continuous Strip, No Dwell
+
+Do not build a carousel as "move, hold, move". Inserted dwell time turns a single glide into a series of jerks, and users report exactly that. Keep the index mapping continuous across the whole scroll range and let acceleration come from the curve, not from pauses.
+
+## 24. Easing
+
+Use a real cubic-bézier solver in JS instead of `smoothstep` everywhere: `smoothstep` gives every phase the same mid-speed and the scene reads mechanical. Working set:
+
+- arrivals (lift, reveal, unfold): `cubic-bezier(.16, 1, .3, 1)`
+- open/close, exits: `cubic-bezier(.22, 1, .36, 1)`
+- in-out transitions: `cubic-bezier(.76, 0, .24, 1)`
+- UI and text fades: `cubic-bezier(.25, 1, .5, 1)`
+
+Skip bounce and elastic by reflex. Overshoot reads as cheap on restrained design worlds (editorial, serif, architectural) and is justified only when the brand itself is playful.
+
+Stagger by a few thousandths of progress per item (`i * 0.006`) when a deck unfolds, so it opens from the front instead of moving as one block.
+
+## 25. Measure Smoothness as a Curve
+
+One screenshot per state proves the keyframes; it says nothing about motion quality. Render a series across the scroll range (41–61 frames at even progress), compute the frame-to-frame difference, and read the result as a velocity profile: it must rise and fall as a single smooth bell, with no isolated spikes and no long zero plateaus inside the animated range.
+
+Calibration: a continuous strip peaked near 17% on the same scene where an equivalent stepped carousel peaked above 30% with visible jerks. Use such figures to compare revisions instead of arguing about feel.
+
+## 26. Smooth-Scroll Libraries
+
+When smooth or kinetic scrolling is requested, integrate Lenis as a local vendor file rather than a CDN script, and **disable the timeline's own lerp while Lenis is active** — Lenis already interpolates the scroll position every frame, and a second smoothing pass adds 0.5–0.8 s of lag.
+
+```js
+lenis = new Lenis({ lerp: 0.09, smoothWheel: true, wheelMultiplier: 1, syncTouch: false });
+// scene render: ease = lenis ? 1 : 0.14
+```
+
+Do not initialise Lenis under `prefers-reduced-motion` (native scroll, instant states) and call `destroy()` if the media query flips. Sticky scenes keep working: Lenis scrolls the real document, not a transform.

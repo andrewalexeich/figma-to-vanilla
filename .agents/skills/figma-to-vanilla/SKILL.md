@@ -4,6 +4,9 @@ description: Converting Figma designs into accurate static HTML/CSS/JS implement
 license: MIT
 metadata:
   author: "Andrey Gorokhov"
+  upstream: "https://github.com/andrewalexeich/figma-to-vanilla"
+  upstream_commit: "8a21e0309f88241794b4a3e3ad31f853d512991c"
+  upstream_checked: "2026-11-16"
 ---
 
 # 1. Purpose
@@ -120,6 +123,9 @@ When clarification or user input is needed during the project, use interactive q
 
 If the AI agent does not support interactive questions, use a clear text-based question instead.
 
+On the first task in a new environment, check the toolchain before implementing (`references/preflight.md`) and offer whatever is missing as one multiselect question.
+
+
 # 4. Reference Rules
 
 Detailed project rules are divided by task and located in the `references/` directory.
@@ -145,6 +151,8 @@ If it becomes clear during the work that the task affects an additional area, re
 | `references/animations.md` | animations, transitions, interactive states, storyboard, Prototype connections, GSAP |
 | `references/verification.md` | visual verification, Live Server, responsive testing, and final result verification |
 | `references/production-git.md` | minification, production files, `.gitignore`, Git, and GitHub |
+| `references/sync-and-contribute.md` | checking this copy against the author's repository before work, updating it, or preparing a pull request with new rules |
+| `references/preflight.md` | the first task in a new environment, checking the toolchain, and installing what is missing |
 
 ## Basic Combinations
 
