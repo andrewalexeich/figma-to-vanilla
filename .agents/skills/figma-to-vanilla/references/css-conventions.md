@@ -51,32 +51,6 @@ max-width;
 gap;
 ```
 
-Use the following for horizontal centering:
-
-```css
-margin: 0 auto;
-```
-
-Do not use the following without strict necessity:
-
-```css
-margin-inline: auto;
-```
-
-Do not use `min-height` as a standard replacement for `height`.
-
-Use `min-height` only in special cases when it is genuinely required by the design or page behavior, for example:
-
-```css
-min-height: 100vh;
-```
-
-In responsive layouts, use `width` and `height` according to the provided Figma designs.
-
-Do not transfer `x` and `y` values from Figma directly into CSS.
-
-Do not use inline styles without necessity.
-
 ## 2. CSS Variables
 
 Move repeated colors, fonts, and other values into CSS custom properties.
@@ -211,6 +185,10 @@ line-height: 120%;
 ```
 
 Do not convert percentage-based `line-height` to px without necessity.
+
+When Figma shows AUTO line height, never leave `line-height: normal`. Chrome resolves `normal` from font metrics (Inter Tight → 1.25em) while Figma computes ≈1.21em, so multiline blocks drift 3–5 px and a section seam appears where the block ends. Set an explicit value taken from the Figma render, and for AUTO round to an integer step in `rem` — a 24 px type rendered on a 26 px step is `2.6rem`, not `2.64rem`: Figma rounds line boxes, and the fractional value accumulates over the block. For small type (`8–9 px`) use the ceil value (`8.5rem`/`6rem`/`3.3rem`/`2.3rem`) rather than the exact ratio.
+
+Check the same property on the text node, not on its section: a child frequently overrides the inherited colour (`#000000` type inside a `#211E1E` block is normal). Read `fills`/`style` of the node that holds the characters.
 
 ### Full Typography Correspondence
 

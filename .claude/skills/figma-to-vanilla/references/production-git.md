@@ -34,7 +34,8 @@ Do not impose fixed source or destination directories for images. Determine thei
 During conversion:
 
 - Create WebP versions of PNG/JPG/JPEG images used by the website.
-- Preserve file names by replacing the extension with `.webp`, provided this does not cause filename conflicts.
+- Preserve file names by replacing the extension with `.webp` when this does not cause filename conflicts.
+- If multiple source images would produce the same WebP file name, do not overwrite an existing file. Use a unique output file name and update the corresponding references. If a conflict cannot be resolved safely, keep the original images in `build/` and preserve their references.
 - Never modify or delete original images in the source project.
 - Copy the required source images to `build/` before conversion, preserving their directory structure.
 - Convert the copied PNG/JPG/JPEG images inside `build/`, not the original files in the source directories.
@@ -75,6 +76,15 @@ The `build/` directory must contain:
 
 Do not assume that the website consists of a single HTML document, one CSS file, or one JavaScript file.
 
+For new projects, preserve the CSS and JavaScript architecture established in `structure.md`:
+
+- **Single-page:** generate minified versions of `global.css`, `page.css`, and `components.css` if it exists and is required by the page. Minify the JavaScript files required by the page.
+- **Multi-page:** generate minified versions of `global.css`, `components.css` if it exists and is required by the implemented pages, and all required `page-<name>.css` files. Generate minified versions of `global.js` if it exists and is used by the implemented pages, and all required `page-<name>.js` files.
+
+Preserve the original CSS file separation in `build/`. Do not combine separate stylesheets into one file unless explicitly required by the user.
+
+Generate only the CSS files that exist and are required by the implemented pages.
+
 Each production HTML document must load the corresponding minified CSS and JavaScript files required by that page.
 
 The HTML documents must use correct paths to all production resources.
@@ -91,46 +101,104 @@ Do not install tools as local project dependencies or create a project-level `no
 
 **CSS Minification**
 
-Use `esbuild` to minify CSS files.
+Use `esbuild` to minify each required CSS file separately.
 
-Example command:
+For a Single-page project, example commands:
 
 ```bash
-npx --yes esbuild src/styles/styles.css --minify --outfile=build/styles/styles.min.css
+npx --yes esbuild src/styles/global.css --minify --outfile=build/styles/global.min.css
 ```
 
-Adapt the input and output paths to the actual project structure. Process all CSS files required by the implemented pages, preserving their directory structure in `build/`.
+```bash
+npx --yes esbuild src/styles/page.css --minify --outfile=build/styles/page.min.css
+```
+
+If `components.css` exists and is required by the implemented pages:
+
+```bash
+npx --yes esbuild src/styles/components.css --minify --outfile=build/styles/components.min.css
+```
+
+For a Multi-page project, process `global.css`, `components.css` if it exists and is required by the implemented pages, and all required `page-<name>.css` files separately.
+
+Adapt all input and output paths to the actual project structure. Preserve the established CSS file separation and directory structure in `build/`.
 
 **JavaScript Minification**
 
-Use `esbuild` to minify JavaScript files.
+Use `esbuild` to minify each required JavaScript file separately.
 
-Example command:
+For a Single-page project, example command:
 
 ```bash
 npx --yes esbuild src/scripts/scripts.js --minify --outfile=build/scripts/scripts.min.js
 ```
 
-Adapt the input and output paths to the actual project structure. Process all JavaScript files required by the implemented pages, preserving their directory structure in `build/`.
+For a Multi-page project, use the following naming convention:
+
+- global.js → global.min.js for shared functionality used by multiple pages.
+- page-<name>.js → page-<name>.min.js for page-specific functionality.
+
+Example commands (run only for files that exist and are required by the implemented pages):
+
+```bash
+npx --yes esbuild src/scripts/global.js --minify --outfile=build/scripts/global.min.js
+```
+
+```bash
+npx --yes esbuild src/scripts/page-index.js --minify --outfile=build/scripts/page-index.min.js
+```
+
+```bash
+npx --yes esbuild src/scripts/page-about.js --minify --outfile=build/scripts/page-about.min.js
+```
+
+```bash
+npx --yes esbuild src/scripts/page-contacts.js --minify --outfile=build/scripts/page-contacts.min.js
+```
+
+Create and minify only the JavaScript files required by the implemented pages. If there is no shared functionality, do not create `global.js`. If a page does not require JavaScript, do not create its `page-<name>.js` file.
+
+If JavaScript files use ES modules:
+- Identify all imported modules and their dependencies.
+- Include all required modules in the production output, preserving their relative directory structure.
+- Minify all required module files separately, using the `.min.js` suffix for generated files (for example, `page.js` → `page.min.js`).
+- Do not bundle separate files unless explicitly requested by the user.
+- Update all relative import paths in production JavaScript to reference the corresponding minified files and their actual locations.
+- Preserve type="module" in HTML script references where required.
+- Verify that static imports and dynamically imported modules with statically determinable paths resolve correctly after minification.
+- Check dynamically generated import paths separately to ensure that their referenced files are available in `build/`.
+Adapt all input and output paths to the actual project structure. Preserve the established JavaScript file separation and directory structure in `build/`.
 
 **WebP Conversion**
 
 Convert eligible PNG/JPG/JPEG images copied to `build/` into WebP using `sharp-cli`.
 
-Example command:
+Example command for an image directory:
 
 ```bash
-npx --yes sharp-cli --input "build/images/**/*.{png,jpg,jpeg}" --output "build/images/{path}/{name}.webp" --format webp --quality 80
+npx --yes sharp-cli --input "build/<actual-image-directory>/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}" --output "build/<actual-image-directory>/{path}/{name}.webp" --format webp --quality 80
 ```
 
-Adapt input and output paths to the actual project structure. Preserve the original directory structure.
+Determine the actual locations of eligible images from the project structure.
+
+If eligible images are stored in multiple directories, process each directory separately. Adapt the input and output paths for each command, preserving the original directory structure.
+
+Before batch conversion, check whether multiple source images would produce the same output path or whether a file with the target WebP name already exists.
+
+Do not run a batch conversion that could overwrite an existing WebP file or another generated output.
+
+Resolve filename conflicts before conversion by assigning unique output names and updating the corresponding references. If a conflict cannot be resolved safely, keep the original images in `build/` and preserve their references.
+
+Include only PNG/JPG/JPEG images used by the website. Exclude favicon directories and any other images that must not be converted.
+
+Do not assume that images are stored in build/images/ or any other predefined directory. Determine their actual locations from the project structure.
 
 Do not convert SVG files, favicons, or font files.
 
 After conversion:
 
 1. Verify that every generated WebP file was created correctly and can be used.
-2. Check image quality and transparency.
+2. Check image quality and transparency. Preserve transparency when converting images that contain transparent areas. Use lossless WebP when necessary to avoid visible quality loss, especially around transparent edges and other important image details.
 3. Update references in production HTML, CSS, and other production resources to use successfully generated WebP files.
 4. Verify that all updated references resolve correctly and that the generated WebP files can be used.
 5. Remove the corresponding original PNG/JPG/JPEG files from `build/` only after successful verification. If conversion or verification fails, keep the original image in `build/` and preserve its references.
@@ -143,7 +211,7 @@ Do not keep successfully converted original PNG/JPG/JPEG files in `build/`.
 When preparing the project for production:
 
 1. Analyze the project structure and identify all HTML, CSS, JavaScript, image, font, and other required resources.
-2. Prepare the `build/` directory.
+2. Prepare a clean `build/` directory. Before removing or replacing existing contents, verify that the directory contains only generated production files. Do not delete unrelated user files or data.
 3. Copy the required HTML documents and project resources into `build/`, following the established production structure. Preserve the original directory structure of assets.
 4. Convert eligible PNG/JPG/JPEG images copied to `build/` into WebP.
 5. Update image references in production HTML, CSS, and other production resources to use successfully generated WebP files. Verify that the updated references resolve correctly.
@@ -168,8 +236,16 @@ When preparing the project for production:
 - For new Multi-page projects, copy all internal HTML pages from `src/pages/` directly into the root of `build/`, without creating a nested `pages/` directory.
 - For existing projects, preserve the established source HTML organization and follow the corresponding production structure.
 - Preserve the original HTML file names.
-- Copy the required CSS, JavaScript, fonts, images, and other resources, preserving the established directory structure.
+- Copy the required fonts, images, and other supporting resources, preserving the established directory structure.
+- Generate minified CSS and JavaScript files directly in their corresponding locations within `build/`, preserving the established file separation and directory structure.
 - Update CSS and JavaScript references in production HTML documents to point to the corresponding minified files.
+- Preserve the CSS loading order defined in `structure.md`: `global.css`, `components.css` when present, and the relevant page-specific stylesheet.
+- Replace source CSS references with the corresponding minified CSS files in `build/`.
+- Replace source JavaScript references with the corresponding minified JavaScript files in `build/`.
+- Preserve the JavaScript loading order and include only scripts required by the current page.
+- Preserve `type="module"` for JavaScript files that use ES modules.
+- Ensure that all JavaScript modules imported by the production scripts are included in `build/`.
+- Include only CSS files that exist and are required by the current page.
 - Update relative resource paths to account for the actual locations of the HTML documents in `build/`.
 - Update internal links between pages to account for their actual locations in `build/`.
 - Check for HTML file name conflicts whenever multiple HTML documents are copied into the same directory.
@@ -182,11 +258,11 @@ The production directory must contain all required files, with paths between HTM
 
 For new Multi-page projects, follow the HTML file organization described above. For existing projects, preserve their established structure unless the user explicitly requests a change.
 
-### CSS and Resource Path Rules
+### CSS, JavaScript, and Resource Path Rules
 
 When preparing production files:
 
-- Minify all CSS files used by the implemented pages and save the generated files in the corresponding locations within `build/`.
+- Minify all CSS and JavaScript files used by the implemented pages and save the generated files in the corresponding locations within `build/`, preserving their established file separation.
 - Keep in mind that relative paths inside CSS are resolved relative to the CSS file's own location, not the HTML document.
 - Preserve the correctness of relative paths to images, fonts, and other resources after copying CSS files to `build/`.
 - Update `url()` references in CSS if images have been converted to WebP or their locations have changed.
@@ -194,6 +270,14 @@ When preparing production files:
 - Check paths in `@import` if these directives are used.
 - Do not leave references in production CSS to resources located only in the source directories.
 - Do not modify source CSS files.
+- Preserve the correctness of JavaScript module and resource paths after copying files to `build/`.
+- Check relative paths used by JavaScript files, including dynamically loaded resources.
+- Preserve relative paths between JavaScript modules and update import paths when generated file names or locations change.
+- Ensure that all statically and dynamically imported modules are available at their referenced locations inside `build/`.
+- Do not leave references in production JavaScript to resources located only in the source directories.
+- Do not modify source JavaScript files.
+
+All required JavaScript files and resources referenced by them must be available inside `build/`.
 
 All required CSS resources and files referenced through `@import` or `url()` must be available inside `build/`.
 
@@ -201,7 +285,7 @@ Verify the correctness of resource paths in all production CSS files, taking int
 
 ### Image Rules
 
-- Preserve the original image files in `src/` without modification.
+- Preserve all original image files in their source locations without modification.
 - Use WebP files in `build/` for successfully converted PNG/JPG/JPEG images.
 - Remove original PNG/JPG/JPEG files from `build/` only after verifying the corresponding WebP files.
 - Keep original files in `build/` if conversion fails.
@@ -215,6 +299,12 @@ Before completing the production preparation, verify:
 - completeness of `build/` and the presence of all required files and resources;
 - presence of all implemented HTML documents;
 - correctness of CSS and JavaScript references in all HTML documents;
+- presence of all required minified JavaScript files;
+- correctness of JavaScript module imports and dynamically loaded resource paths;
+- presence of all required JavaScript modules and their dependencies;
+- correctness of relative import paths after minification;
+- preservation of required JavaScript module loading in production HTML documents;
+- absence of references in production JavaScript to files located only in source directories;
 - correctness of paths to images, fonts, and other resources;
 - correctness of `url()` and `@import` references in all production CSS files;
 - absence of references from `build/` to files located inside source directories;
@@ -353,3 +443,15 @@ If authentication or access is unavailable, inform the user.
 Do not claim that a repository has been created or a push has been completed unless the corresponding operation has actually completed successfully.
 
 The `.agents/` or `.claude/` directory must not be used as a location for the website's HTML/CSS/JS files.
+
+## 7. Deploy Verification
+
+Uploading is not deploying. After the files are uploaded — by whatever means the project uses (`rsync`, `scp`, a CI step) — verify the deployed production output:
+
+1. A dry run of the upload (`rsync --dry-run --itemize-changes` when rsync is used) between the build output and the target returns no pending changes.
+2. SHA-256 checksums of all production HTML documents and their referenced minified CSS/JavaScript files match between `build/` and the deployment target. Check only the CSS and JavaScript files actually used by each page.
+3. The live URL serves the current HTML documents, and every referenced CSS, JavaScript, image, font, and other required resource resolves successfully, returning HTTP 200 after any redirects.
+
+If a verification method is unavailable, report which checks could not be completed. Do not claim successful deployment based only on an upload command or its exit code.
+
+An exit code of 0 proves the copy ran, not that the target is current.
